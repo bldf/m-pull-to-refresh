@@ -80,8 +80,5 @@
     "react": "16.x",
     "react-dom": "16.x",
     "react-test-renderer": "^15.5.0"
-  },
-  "pre-commit": [
-    "lint"
-  ]
+  }
 }

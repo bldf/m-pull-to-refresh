@@ -17,8 +17,7 @@ function setTransform(nodeStyle: any, value: any) {
   nodeStyle.MozTransform = value;
 }
 
-const isWebView = typeof navigator !== 'undefined' &&
-  /(iPhone|iPod|iPad).*AppleWebKit(?!.*Safari)/i.test(navigator.userAgent);
+const isWebView = typeof navigator !== 'undefined' && /(iPhone|iPod|iPad).*AppleWebKit(?!.*Safari)/i.test(navigator.userAgent);
 const DOWN = 'down';
 const UP = 'up';
 const INDICATOR = { activate: 'release', deactivate: 'pull', release: 'loading', finish: 'finish' };
@@ -101,7 +100,7 @@ export default class PullToRefresh extends React.Component<PropsType, any> {
     if (!this.state.dragOnEdge && this._isMounted) {
       if (this.props.refreshing) {
         if (this.props.direction === UP) {
-          this._lastScreenY = - this.props.distanceToRefresh - 1;
+          this._lastScreenY = -this.props.distanceToRefresh - 1;
         }
         if (this.props.direction === DOWN) {
           this._lastScreenY = this.props.distanceToRefresh + 1;
@@ -112,7 +111,7 @@ export default class PullToRefresh extends React.Component<PropsType, any> {
         this.setState({ currSt: 'finish' }, () => this.reset());
       }
     }
-  }
+  };
 
   init = (ele: any) => {
     if (!ele) {
@@ -128,7 +127,7 @@ export default class PullToRefresh extends React.Component<PropsType, any> {
     Object.keys(this._to).forEach(key => {
       ele.addEventListener(key, this._to[key], willPreventDefault);
     });
-  }
+  };
 
   destroy = (ele: any) => {
     if (!this._to || !ele) {
@@ -138,13 +137,13 @@ export default class PullToRefresh extends React.Component<PropsType, any> {
     Object.keys(this._to).forEach(key => {
       ele.removeEventListener(key, this._to[key]);
     });
-  }
+  };
 
   onTouchStart = (_ele: any, e: any) => {
     this._ScreenY = this._startScreenY = e.touches[0].screenY;
     // 一开始 refreshing 为 true 时 this._lastScreenY 有值
     this._lastScreenY = this._lastScreenY || 0;
-  }
+  };
 
   isEdge = (ele: any, direction: string) => {
     const container = this.props.getScrollContainer();
@@ -159,12 +158,12 @@ export default class PullToRefresh extends React.Component<PropsType, any> {
       }
     }
     if (direction === UP) {
-      return ele.scrollHeight - ele.scrollTop === ele.clientHeight;
+      return ele.scrollHeight - (ele.scrollTop + 1) > ele.clientHeight;
     }
     if (direction === DOWN) {
       return ele.scrollTop <= 0;
     }
-  }
+  };
 
   damping = (dy: number): number => {
     if (Math.abs(this._lastScreenY) > this.props.damping) {
@@ -175,7 +174,7 @@ export default class PullToRefresh extends React.Component<PropsType, any> {
     dy *= (1 - ratio) * this.props.scale;
 
     return dy;
-  }
+  };
 
   onTouchMove = (ele: any, e: any) => {
     // 使用 pageY 对比有问题
@@ -183,8 +182,7 @@ export default class PullToRefresh extends React.Component<PropsType, any> {
     const { direction } = this.props;
 
     // 拖动方向不符合的不处理
-    if (direction === UP && this._startScreenY < _screenY ||
-      direction === DOWN && this._startScreenY > _screenY) {
+    if ((direction === UP && this._startScreenY < _screenY) || (direction === DOWN && this._startScreenY > _screenY)) {
       return;
     }
 
@@ -225,7 +223,7 @@ export default class PullToRefresh extends React.Component<PropsType, any> {
         this.onTouchEnd();
       }
     }
-  }
+  };
 
   onTouchEnd = () => {
     if (this.state.dragOnEdge) {
@@ -243,42 +241,36 @@ export default class PullToRefresh extends React.Component<PropsType, any> {
     } else {
       this.reset();
     }
-  }
+  };
 
   reset = () => {
     this._lastScreenY = 0;
     this.setContentStyle(0);
-  }
+  };
 
   setContentStyle = (ty: number) => {
     // todos: Why sometimes do not have `this.contentRef` ?
     if (this.contentRef) {
       setTransform(this.contentRef.style, `translate3d(0px,${ty}px,0)`);
     }
-  }
+  };
 
   render() {
     const props = { ...this.props };
 
     delete props.damping;
 
-    const {
-      className, prefixCls, children, getScrollContainer,
-      direction, onRefresh, refreshing, indicator, distanceToRefresh, ...restProps,
-    } = props;
+    const { className, prefixCls, children, getScrollContainer, direction, onRefresh, refreshing, indicator, distanceToRefresh, ...restProps } = props;
 
-    const renderChildren = <StaticRenderer
-      shouldUpdate={this.shouldUpdateChildren} render={() => children} />;
+    const renderChildren = <StaticRenderer shouldUpdate={this.shouldUpdateChildren} render={() => children} />;
 
     const renderRefresh = (cls: string) => {
       const cla = classNames(cls, !this.state.dragOnEdge && `${prefixCls}-transition`);
       return (
         <div className={`${prefixCls}-content-wrapper`}>
-          <div className={cla} ref={el => this.contentRef = el}>
+          <div className={cla} ref={el => (this.contentRef = el)}>
             {direction === UP ? renderChildren : null}
-            <div className={`${prefixCls}-indicator`}>
-              {(indicator as any)[this.state.currSt] || (INDICATOR as any)[this.state.currSt]}
-            </div>
+            <div className={`${prefixCls}-indicator`}>{(indicator as any)[this.state.currSt] || (INDICATOR as any)[this.state.currSt]}</div>
             {direction === DOWN ? renderChildren : null}
           </div>
         </div>
@@ -289,11 +281,7 @@ export default class PullToRefresh extends React.Component<PropsType, any> {
       return renderRefresh(`${prefixCls}-content ${prefixCls}-${direction}`);
     }
     return (
-      <div
-        ref={el => this.containerRef = el}
-        className={classNames(className, prefixCls, `${prefixCls}-${direction}`)}
-        {...restProps}
-      >
+      <div ref={el => (this.containerRef = el)} className={classNames(className, prefixCls, `${prefixCls}-${direction}`)} {...restProps}>
         {renderRefresh(`${prefixCls}-content`)}
       </div>
     );
